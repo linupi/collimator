@@ -17,6 +17,7 @@ from FreeCAD import Vector
 import Part
 import Draft
 import ImportGui
+import Mesh
 
 # FreeCAD global setup
 doc = App.activeDocument()
@@ -39,6 +40,17 @@ grid_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorGrid.js
 # json file that specifies the outer box of the collimator
 box_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorBox.json"
 
+# output files
+output_root = "/tmp/collimator_freecad/"
+
+# export final step file
+final_step_file = output_root + "collimator.step"
+
+# export final stl mesh
+final_stl_file = output_root + "collimator.stl"
+
+# save Freecad file
+final_freecad_file = output_root + "collimator.FCStd"
 
 ######### parameters that may need to be adjusted ######
 
@@ -349,6 +361,11 @@ doc.removeObject(box.Name)
 doc.removeObject(clip_box.obj.Name)
 
 collimator.recompute()
+
+# export and save
+Mesh.export([collimator], final_stl_file)
+ImportGui.export([collimator], final_step_file)
+doc.saveAs(final_freecad_file)
 
 print("Full fusion")
 print("End time:", asctime())
