@@ -56,13 +56,21 @@ box_wallthickness = 1
 ########## helper functions and classes ######
 
 
+def cut_line(p, q, x0):
+    """p,q: coordinate triples defining a line in 3d.
+    returns the point where this line crosses [x0,?,?] """
+    m = p - q
+    l = (x0 - p[0]) / m[0]
+    return np.array([x0, p[1] + l * m[1], p[2] + l * m[2]])
+
+
 def faceNormal(v1, v2):
     tmp = np.cross(v1, v2)
     return tmp / np.linalg.norm(tmp)
 
 
 class Blade:
-    def __init__(self, corners_centerplain, wallthickness, name):
+    def __init__(self, corners_centerplain, wallthickness, name, box_x_min, box_x_max):
         """corners_centerplain should be a list of 4 elements that contain (x,y,z)
         tripples each"""
 
@@ -77,16 +85,34 @@ class Blade:
 
         # list that will take corner positions for the blade
         fsw = self.normal * self.half_wallth
+
         self.corners = [
-            self.cpc[3] - fsw,
-            self.cpc[0] - fsw,
-            self.cpc[1] - fsw,
-            self.cpc[2] - fsw,
-            self.cpc[3] + fsw,
-            self.cpc[0] + fsw,
-            self.cpc[1] + fsw,
-            self.cpc[2] + fsw,
+            cut_line(
+                self.cpc[3] - fsw, self.cpc[2] - fsw, box_x_min
+            ),  # self.cpc[3] - fsw,
+            cut_line(
+                self.cpc[0] - fsw, self.cpc[1] - fsw, box_x_min
+            ),  # self.cpc[0] - fsw,
+            cut_line(
+                self.cpc[1] - fsw, self.cpc[0] - fsw, box_x_max
+            ),  # self.cpc[1] - fsw,
+            cut_line(
+                self.cpc[2] - fsw, self.cpc[3] - fsw, box_x_max
+            ),  # self.cpc[2] - fsw,
+            cut_line(
+                self.cpc[3] + fsw, self.cpc[2] + fsw, box_x_min
+            ),  # self.cpc[3] + fsw,
+            cut_line(
+                self.cpc[0] + fsw, self.cpc[1] + fsw, box_x_min
+            ),  # self.cpc[0] + fsw,
+            cut_line(
+                self.cpc[1] + fsw, self.cpc[0] + fsw, box_x_max
+            ),  # self.cpc[1] + fsw,
+            cut_line(
+                self.cpc[2] + fsw, self.cpc[3] + fsw, box_x_max
+            ),  # self.cpc[2] + fsw,
         ]
+
         self.faces = [
             [0, 1, 2, 3],
             [4, 5, 1, 0],
@@ -188,7 +214,13 @@ boxwalls = json_data_box["mybox"][0:4]
 
 blades = []
 for i, c in enumerate(walls):
-    b = Blade(c, grid_wallthickness, f"Blade{i}")
+    b = Blade(
+        c,
+        grid_wallthickness,
+        f"Blade{i}",
+        json_data_box["c1ThetaMinPhiMin"][0],
+        json_data_box["c2ThetaMinPhiMin"][0],
+    )
     blades.append(b)
 
 print("blade generation done")
