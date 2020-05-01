@@ -29,19 +29,23 @@ doc = App.activeDocument()
 ########## path to resources ######
 
 # temporal storage for intermediate files
-tmp_path = "/tmp/collimator_freecad"
+#tmp_path = "/tmp/collimator_freecad"
+tmp_path = str(Path.home()) + "/collimator_tmp/collimator_freecad"
 
 # all paths below will be relative to this
 resorces_root = str(Path.home()) + "/collimator.git/"
 
 # json file that contains the inner grid of the collimator
-grid_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorGrid.json"
+#grid_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorGrid.json"
+grid_file = resorces_root + "examples/id31_draft/RadialCollimatorGrid.json"
+
 
 # json file that specifies the outer box of the collimator
-box_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorBox.json"
+#box_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorBox.json"
+box_file = resorces_root + "examples/id31_draft/RadialCollimatorGrid.json"
 
 # output files
-output_root = "/tmp/collimator_freecad/"
+output_root = tmp_path
 
 # export final step file
 final_step_file = output_root + "collimator.step"
