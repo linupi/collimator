@@ -1,5 +1,5 @@
 # collimator
-This is a collection of scripts to design 3d printed collimators.
+This is a collection of scripts to design 3d printed radial collimators.
 
 ## Prerequisite & Setup
 - FreeCAD
@@ -7,12 +7,25 @@ This is a collection of scripts to design 3d printed collimators.
   - To have the scripts availabe in the either change the _User macros location_ or link the files inside `FreeCAD_scripts` to the default _user macros location_ (`ln -s collimator.git/FreeCAD_scripts/Collimator.FCMacro ~/.FreeCAD/MacroCollimator.FCMacro`)
 
 ## Steps to design a (Soller) collimator
-1. create grid
-1. create 3d model
-  1.1 Using FreeCAD
+### 1. create grid
+  - using python
+  
+    _to come_
+  - using Mathematica
+  
+    _to come_
+### 2. create 3d model
+  - using FreeCAD
+  
     - put the correct pathes in the `/.FreeCAD/Macro`
-1. validate 3d model
-
+  - OpenSCAD
+  
+    _to_come
+    
+### 3. validate 3d model
+  
+   _to_come_
+  
 ## Software dependencies
 - python
 - [FreeCAD](https://www.freecadweb.org)
