@@ -1,0 +1,303 @@
+# -*- coding: utf-8 -*-
+#
+#
+# Copyright (c) 2020 Linus Pithan linus.pithan@esrf.fr
+# Distributed under the GNU LGPLv3. See LICENSE for more info.
+
+# general python imports
+import json
+import functools
+import numpy as np
+from time import asctime, time
+import os
+from pathlib import Path
+
+# FreeCAD specific imports
+from FreeCAD import Vector
+import Part
+import Draft
+import ImportGui
+
+# FreeCAD global setup
+doc = App.activeDocument()
+
+# print("Current working directory:", os.getcwd() )
+# print("home", str(Path.home()))
+
+
+########## path to resources ######
+
+# temporal storage for intermediate files
+tmp_path = "/tmp/collimator_freecad"
+
+# all paths below will be relative to this
+resorces_root = str(Path.home()) + "/collimator.git/"
+
+# json file that contains the inner grid of the collimator
+grid_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorGrid.json"
+
+# json file that specifies the outer box of the collimator
+box_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorBox.json"
+
+
+######### parameters that may need to be adjusted ######
+
+# to reduce occupied ram resouces the 3d model will be created in two steps
+# first generating chunks consisting of n (`chunksize`) blades which will be
+# fused together afterwards
+chunksize = 100
+
+# wallthickness of inner grid structure in mm
+grid_wallthickness = .3
+
+# wallthickness of outer box wall in mm
+box_wallthickness = 1
+
+########## helper functions and classes ######
+
+
+def faceNormal(v1, v2):
+    tmp = np.cross(v1, v2)
+    return tmp / np.linalg.norm(tmp)
+
+
+class Blade:
+    def __init__(self, corners_centerplain, wallthickness, name):
+        """corners_centerplain should be a list of 4 elements that contain (x,y,z)
+        tripples each"""
+
+        self.name = name
+        self.half_wallth = wallthickness / 2.
+
+        # corners of central plain cpc
+        self.cpc = np.array(corners_centerplain)
+
+        # normal vector
+        self.normal = faceNormal(self.cpc[0] - self.cpc[1], self.cpc[0] - self.cpc[2])
+
+        # list that will take corner positions for the blade
+        fsw = self.normal * self.half_wallth
+        self.corners = [
+            self.cpc[3] - fsw,
+            self.cpc[0] - fsw,
+            self.cpc[1] - fsw,
+            self.cpc[2] - fsw,
+            self.cpc[3] + fsw,
+            self.cpc[0] + fsw,
+            self.cpc[1] + fsw,
+            self.cpc[2] + fsw,
+        ]
+        self.faces = [
+            [0, 1, 2, 3],
+            [4, 5, 1, 0],
+            [7, 6, 5, 4],
+            [5, 6, 2, 1],
+            [6, 7, 3, 2],
+            [7, 4, 0, 3],
+        ]
+
+        faces = list()
+        for face in self.faces:
+            edges = list()
+            for i in range(4):
+                edges.append(
+                    Part.Edge(
+                        Part.LineSegment(
+                            Vector(*self.corners[face[i]]),
+                            Vector(*self.corners[face[(i + 1) % 4]]),
+                        )
+                    )
+                )
+            faces.append(Part.Face(Part.Wire(edges)))
+
+        shell = Part.Compound(faces)
+        self.solid = Part.Solid(Part.Shell(faces))
+
+        self._obj = None
+
+    @property
+    def obj(self):
+        if self._obj == None:
+            self._obj = doc.addObject("Part::Feature", self.name)
+            self._obj.Shape = self.solid
+        return self._obj
+
+
+class ClipBox:
+    def __init__(self, box):
+
+        self.corners = [
+            box["c2ThetaMinPhiMax"],
+            box["c1ThetaMinPhiMax"],
+            box["c1ThetaMaxPhiMax"],
+            box["c2ThetaMaxPhiMax"],
+            box["c2ThetaMinPhiMin"],
+            box["c1ThetaMinPhiMin"],
+            box["c1ThetaMaxPhiMin"],
+            box["c2ThetaMaxPhiMin"],
+        ]
+
+        self.faces = [
+            [0, 1, 2, 3],
+            [4, 5, 1, 0],
+            [7, 6, 5, 4],
+            [5, 6, 2, 1],
+            [6, 7, 3, 2],
+            [7, 4, 0, 3],
+        ]
+
+        faces = list()
+        for face in self.faces:
+            edges = list()
+            for i in range(4):
+                edges.append(
+                    Part.Edge(
+                        Part.LineSegment(
+                            Vector(*self.corners[face[i]]),
+                            Vector(*self.corners[face[(i + 1) % 4]]),
+                        )
+                    )
+                )
+            faces.append(Part.Face(Part.Wire(edges)))
+
+        shell = Part.Compound(faces)
+        self.solid = Part.Solid(Part.Shell(faces))
+        self.obj = doc.addObject("Part::Feature", "Clipbox")
+        self.obj.Shape = self.solid
+
+
+########### patch the collimator together ########
+
+if not os.path.exists(tmp_path):
+    os.makedirs(tmp_path)
+
+print("*" * 30)
+print("Staring time:", asctime())
+start = time()
+
+with open(grid_file) as json_file:
+    json_data_walls = json.load(json_file)
+
+with open(box_file) as json_file:
+    json_data_box = json.load(json_file)
+
+
+walls = json_data_walls["mywalls"]  # [0:300] #to reduce the number of blades for dev
+boxwalls = json_data_box["mybox"][0:4]
+
+
+blades = []
+for i, c in enumerate(walls):
+    b = Blade(c, grid_wallthickness, f"Blade{i}")
+    blades.append(b)
+
+print("blade generation done")
+
+clip_box = ClipBox(json_data_box)
+
+print("clipbox done")
+
+blade_chunks = [blades[x : x + chunksize] for x in range(0, len(blades), chunksize)]
+print("total number of chunks", len(blade_chunks))
+
+blade_fusion_list = list()
+for i, ch in enumerate(blade_chunks):
+    chunk = [x.obj for x in ch]
+    fus = doc.addObject("Part::MultiFuse", f"Fusion_{i}")
+    fus.Shapes = chunk
+    print(f"fusion {i} generated")
+    fus.recompute()
+
+    com = doc.addObject("Part::MultiCommon", f"Common_{i}")
+    com.Shapes = [fus, clip_box.obj]
+    com.recompute()
+
+    print(f"common {i} generated")
+
+    com2 = doc.addObject("Part::Feature", f"Part_{i}")
+    com2.Shape = com.Shape.removeSplitter()
+
+    getattr(Gui.ActiveDocument, f"Common_{i}").hide()
+
+    print(f"removeSplitter {i} done")
+    # blade_fusion_list.append(com2)
+    # doc.Fusion.removeSplitter( )
+    doc.recompute()
+
+    print(f"export {i}")
+    path = str(os.path.join(tmp_path, f"block_{i}.step"))
+    ImportGui.export([com2], path)
+    blade_fusion_list.append(path)
+
+    doc.removeObject(com2.Name)
+    del com2
+
+    doc.removeObject(com.Name)
+    del com
+
+    doc.removeObject(fus.Name)
+    del fus
+
+    for o in chunk:
+        doc.removeObject(o.Name)
+    del chunk
+
+    doc.recompute()
+
+print("*** done with blade loop")
+
+for path in blade_fusion_list:
+    ImportGui.insert(path, doc.Name)
+
+# replace paths with objs in blade_fusion_list
+blade_fusion_list = [o for o in doc.Objects if "Part_" in o.Name]
+doc.recompute()
+# ~ blade_fusion=doc.addObject("Part::MultiFuse",f"Fusion")
+# ~ blade_fusion.Shapes=blade_fusion_list
+# ~ doc.recompute()
+
+
+blade_fusion = doc.addObject("Part::Compound", "Compound")
+blade_fusion.Links = blade_fusion_list
+doc.recompute()
+
+print("fusion done")
+
+blade_fusion2 = Draft.downgrade(blade_fusion, delete=True)[0]
+del blade_fusion
+
+print("downgrade done")
+
+blade_fusion3 = doc.addObject("Part::MultiFuse", f"Fusion")
+blade_fusion3.Shapes = blade_fusion2
+doc.recompute()
+
+print("re fusion done")
+
+box = doc.addObject("Part::Thickness", "OuterBox")
+box.Faces = (clip_box.obj, ["Face4", "Face6"])
+box.Value = box_wallthickness
+box.Mode = 0
+box.Join = 0
+box.Intersection = False
+box.SelfIntersection = False
+box.recompute()
+
+print("boundbox done")
+
+
+collimator_raw = doc.addObject("Part::MultiFuse", "Collimator_raw")
+collimator_raw.Shapes = [blade_fusion3, box]
+print("full_fusion generated")
+
+doc.recompute()
+print("full_fusion done")
+collimator = doc.addObject("Part::Feature", "Collimator")
+collimator.Shape = collimator_raw.Shape.removeSplitter()
+Gui.ActiveDocument.Collimator_raw.hide()
+collimator.recompute()
+
+print("Full fusion")
+print("End time:", asctime())
+print("Took", time() - start, "s")
+##################################################
