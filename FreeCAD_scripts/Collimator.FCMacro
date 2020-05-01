@@ -208,7 +208,7 @@ with open(box_file) as json_file:
     json_data_box = json.load(json_file)
 
 
-walls = json_data_walls["mywalls"]  # [0:300] #to reduce the number of blades for dev
+walls = json_data_walls["mywalls"]  # [0:50] #to reduce the number of blades for dev
 boxwalls = json_data_box["mybox"][0:4]
 
 
@@ -240,7 +240,11 @@ for i, ch in enumerate(blade_chunks):
     print(f"fusion {i} generated")
     fus.recompute()
 
+    #    fus2 = doc.addObject("Part::Feature", f"Fusion2_{i}")
+    #    fus2.Shape = fus.Shape.removeSplitter()
+
     com = doc.addObject("Part::MultiCommon", f"Common_{i}")
+    #    com.Shapes = [fus2, clip_box.obj]
     com.Shapes = [fus, clip_box.obj]
     com.recompute()
 
@@ -267,6 +271,9 @@ for i, ch in enumerate(blade_chunks):
     doc.removeObject(com.Name)
     del com
 
+    # ~ doc.removeObject(fus2.Name)
+    # ~ del fus2
+
     doc.removeObject(fus.Name)
     del fus
 
@@ -284,14 +291,15 @@ for path in blade_fusion_list:
 # replace paths with objs in blade_fusion_list
 blade_fusion_list = [o for o in doc.Objects if "Part_" in o.Name]
 doc.recompute()
-# ~ blade_fusion=doc.addObject("Part::MultiFuse",f"Fusion")
-# ~ blade_fusion.Shapes=blade_fusion_list
-# ~ doc.recompute()
 
 
 blade_fusion = doc.addObject("Part::Compound", "Compound")
 blade_fusion.Links = blade_fusion_list
 doc.recompute()
+
+for o in blade_fusion_list:
+    doc.removeObject(o.Name)
+del blade_fusion_list
 
 print("fusion done")
 
@@ -299,12 +307,14 @@ blade_fusion2 = Draft.downgrade(blade_fusion, delete=True)[0]
 del blade_fusion
 
 print("downgrade done")
-
+start_fusion = time()
 blade_fusion3 = doc.addObject("Part::MultiFuse", f"Fusion")
 blade_fusion3.Shapes = blade_fusion2
 doc.recompute()
 
-print("re fusion done")
+print(
+    f"re fusion done (Took {time() - start_fusion} s // {(time() - start_fusion)/3600} h)"
+)
 
 box = doc.addObject("Part::Thickness", "OuterBox")
 box.Faces = (clip_box.obj, ["Face4", "Face6"])
@@ -326,10 +336,22 @@ doc.recompute()
 print("full_fusion done")
 collimator = doc.addObject("Part::Feature", "Collimator")
 collimator.Shape = collimator_raw.Shape.removeSplitter()
-Gui.ActiveDocument.Collimator_raw.hide()
+# Gui.ActiveDocument.Collimator_raw.hide()
+
+
+# remove stuff that is lying around
+doc.removeObject(collimator_raw.Name)
+doc.removeObject(blade_fusion3.Name)
+for o in blade_fusion2:
+    doc.removeObject(o.Name)
+
+doc.removeObject(box.Name)
+doc.removeObject(clip_box.obj.Name)
+
 collimator.recompute()
 
 print("Full fusion")
 print("End time:", asctime())
-print("Took", time() - start, "s")
+print(f"Took {time() - start} s // {(time() - start)/3600} h")
+
 ##################################################
