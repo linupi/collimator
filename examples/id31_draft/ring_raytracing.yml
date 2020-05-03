@@ -19,19 +19,19 @@ povray_output:
 
 # Camera position
 camera:
-  #~ - orthographic
-  #~ - angle: 35
-  #~ - up: [0,100,0]
-  #~ - right: [100,0,0] 
-  #~ - location: [120, 100, 120]
-  #~ - look_at: [120,600, 120]
-  
   - orthographic
-  - angle: 57 
+  - angle: 35
   - up: [0,100,0]
   - right: [100,0,0] 
-  - location: [0, 100, 0]
-  - look_at: [0,400, 0]
+  - location: [120, 100, 120]
+  - look_at: [120,600, 120]
+  
+  #~ - orthographic
+  #~ - angle: 57 
+  #~ - up: [0,100,0]
+  #~ - right: [100,0,0] 
+  #~ - location: [0, 100, 0]
+  #~ - look_at: [0,400, 0]
   
 # input file 
 input_file: examples/id31_draft/RadialCollimator.inc       #.inc file (converted from stl)
