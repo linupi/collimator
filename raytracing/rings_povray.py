@@ -29,6 +29,7 @@ with open(sys.argv[-1], "r") as stream:
 
 dis = config["ringpattern"]["pinhole_distance"]
 # (*distance lightsource pinhole in mm*)
+widthInRadian =  np.deg2rad(config["ringpattern"]["reflection_width"]) #(*natual width of the reflections*)
 ringpos = np.deg2rad(
     config["ringpattern"]["ringpositions"]
 )  # (*angular position of diffraction features*)
@@ -38,8 +39,8 @@ def CalcMinMaxRad(r):
     return np.transpose(
         np.array(
             [
-                np.tan(r - config["ringpattern"]["reflection_width"] / 2) * dis,
-                np.tan(r + config["ringpattern"]["reflection_width"] / 2) * dis,
+                np.tan(r - widthInRadian / 2) * dis,
+                np.tan(r + idthInRadian / 2) * dis,
             ]
         )
     )
