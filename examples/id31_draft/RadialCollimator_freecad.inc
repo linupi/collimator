@@ -10,7 +10,7 @@
 // The abovementioned coordinates are in the STL file's right-handed
 // coordinate system, while POV-ray uses a left-handed system.
 // You should swap the x and y above to get POV-ray coordinates.
-# declare m_Processed_by_ADMesh = mesh {
+# declare m_Processed by ADMesh version 0.98.3 = mesh {
   triangle { // #1
     <8.19999981, 20.0, -0.200000003>,
     <-6.80000019, 750.0, -6.80000019>,
