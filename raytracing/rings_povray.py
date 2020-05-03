@@ -23,7 +23,7 @@ import os
 import re
 
 # load configuration
-with open(sys.argv[1], "r") as stream:
+with open(sys.argv[-1], "r") as stream:
     config = yaml.load(stream, Loader=yaml.SafeLoader)
 
 
