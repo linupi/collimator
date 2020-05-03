@@ -1,0 +1,40 @@
+
+# ring pattern calculation
+ringpattern:
+  pinhole_distance: 1                 # distance lightsource pinhole in mm
+  reflection_width: .25       # natual width of the simulated reflections in deg
+  ringpositions: [2,  4, 6, 9,12,15,18]          # in deg
+
+# source displacement in simulation
+simulation_range:
+  min: -10
+  max: 11
+  step: 5
+
+# povray output parameters
+povray_output:
+    width: 601
+    height: 601
+    antialiasing: 0.001
+
+# Camera position
+camera:
+  #~ - orthographic
+  #~ - angle: 35
+  #~ - up: [0,100,0]
+  #~ - right: [100,0,0] 
+  #~ - location: [120, 100, 120]
+  #~ - look_at: [120,600, 120]
+  
+  - orthographic
+  - angle: 57 
+  - up: [0,100,0]
+  - right: [100,0,0] 
+  - location: [0, 100, 0]
+  - look_at: [0,400, 0]
+  
+# input file 
+input_file: examples/id31_draft/RadialCollimator.inc       #.inc file (converted from stl)
+
+# output path
+output_dir: examples/id31_draft/raytracing_output

@@ -10,7 +10,7 @@
 // The abovementioned coordinates are in the STL file's right-handed
 // coordinate system, while POV-ray uses a left-handed system.
 // You should swap the x and y above to get POV-ray coordinates.
-# declare m_MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH-MESH = mesh {
+# declare m_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH_MESH = mesh {
   triangle { // #1
     <306.954864502, 750.0, 307.880432129>,
     <8.35486030579, 20.0, 9.28042316437>,
