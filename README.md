@@ -34,12 +34,22 @@ $ ln -s [PATH TO collimator git] collimator.git
 ```
 $ python2.7 external_tools/py-stl-3.1/stl2pov.py RadialCollimator.stl RadialCollimator.inc
 ```
+
+  For the follwoing steps some python dependencies need to be installed e.g. in conda enviroment:
   
+```
+conda create --name collimator_env python=3.7
+conda activate collimator_env
+conda config --env --append channels conda-forge
+conda install silx moviepy scipy numpy matplotlib imageio jupyter pyyaml
+pip install vapory
+```
 
 ## Software dependencies
 - python
 - [FreeCAD](https://www.freecadweb.org)
 - [OpenSCAD](https://www.openscad.org)
+- povray
 
 ## Further reading
 - [A novel 3D printed radial collimator for x-ray diffraction](https://aip.scitation.org/doi/suppl/10.1063/1.5063520) by S. Kowarik, L. Bogula, S. Boitano, F. Carlà, H. Pithan, P. Schäfer, H. Wilming, A. Zykov and L. Pithan 
