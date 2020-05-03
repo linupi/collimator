@@ -13,7 +13,7 @@ $ python raytracing/rings_only_run_povray.py ring_raytracing.yml
 """
 
 from vapory import *
-from subprocess import Popen
+from subprocess import Popen,PIPE
 import numpy as np
 from moviepy.editor import ImageSequenceClip
 from silx.math.histogram import Histogramnd
@@ -73,6 +73,10 @@ if "-" in object_name:
     Popen(["sed", "-i", "-e", 's/'+object_name+'/'+newname+'/g' , soller]).communicate()
     object_name=newname
 print("using ",object_name )
+
+### make sure that soller does not show with povray but only produces shadow
+if "no_image" not in Popen(["tail", "-n", "1" ,soller], stdout=PIPE).communicate()[0].decode():
+    Popen(["sed", "-i" ,'$s/}/no_image}/',soller]).communicate()
 
 ## create output dir if needed
 if not os.path.exists(config["output_dir"]):
