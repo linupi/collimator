@@ -8,8 +8,8 @@ ringpattern:
 # source displacement in simulation
 simulation_range:
   min: -10
-  max: 11
-  step: 5
+  max: 10
+  step: .1
 
 # povray output parameters
 povray_output:

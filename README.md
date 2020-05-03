@@ -35,7 +35,7 @@ $ ln -s [PATH TO collimator git] collimator.git
 $ python2.7 external_tools/py-stl-3.1/stl2pov.py RadialCollimator.stl RadialCollimator.inc
 ```
 
-  For the follwoing steps some python dependencies need to be installed e.g. in conda enviroment:
+  - For the follwoing steps some python dependencies need to be installed e.g. in conda enviroment:
   
 ```
 conda create --name collimator_env python=3.7
@@ -43,6 +43,21 @@ conda activate collimator_env
 conda config --env --append channels conda-forge
 conda install silx moviepy scipy numpy matplotlib imageio jupyter pyyaml
 pip install vapory
+```
+ 
+ - run povray using
+ 
+```
+$ ./raytracing/run_rings_povray.sh
+--- or --- if you happen to have a cluster at hand:
+$ oarsub -l nodes=1/core=8,walltime=00:02:00 ./raytracing/run_rings_povray.sh
+```
+ 
+ - look at the results in a jupter notebook
+ 
+```
+$ cd raytracing
+$ jupyter notebook
 ```
 
 ## Software dependencies
