@@ -28,9 +28,14 @@ $ ln -s [PATH TO collimator git] collimator.git
     _to_come
     
 ### 3. validate 3d model
+  This is the procedure to do some raytracing on the files generated in the steps above.
+  - convert a _.stl_ file into _.inc_ as  _povray_
+    
+```
+$ python2.7 external_tools/py-stl-3.1/stl2pov.py RadialCollimator.stl RadialCollimator.inc
+```
   
-   _to_come_
-  
+
 ## Software dependencies
 - python
 - [FreeCAD](https://www.freecadweb.org)
@@ -38,3 +43,8 @@ $ ln -s [PATH TO collimator git] collimator.git
 
 ## Further reading
 - [A novel 3D printed radial collimator for x-ray diffraction](https://aip.scitation.org/doi/suppl/10.1063/1.5063520) by S. Kowarik, L. Bogula, S. Boitano, F. Carlà, H. Pithan, P. Schäfer, H. Wilming, A. Zykov and L. Pithan 
+
+
+## Thanks to ... 
+- [py-stl-3.1](https://rsmith.home.xs4all.nl/software/py-stl-stl2pov.html) by Roland Smith
+   ... the corresponding packages are parcially redistributed in `\external_toos`
