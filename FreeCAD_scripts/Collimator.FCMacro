@@ -42,7 +42,7 @@ grid_file = resorces_root + "examples/id31_draft/RadialCollimatorGrid.json"
 
 # json file that specifies the outer box of the collimator
 #box_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorBox.json"
-box_file = resorces_root + "examples/id31_draft/RadialCollimatorGrid.json"
+box_file = resorces_root + "examples/id31_draft/RadialCollimatorBox.json"
 
 # output files
 output_root = tmp_path
