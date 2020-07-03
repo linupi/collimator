@@ -42,7 +42,7 @@ grid_file = resorces_root + "examples/id31_draft/RadialCollimatorGrid.json"
 
 # json file that specifies the outer box of the collimator
 #box_file = resorces_root + "examples/id03_pilatus_300kW/RadialCollimatorBox.json"
-box_file = resorces_root + "examples/id31_draft/RadialCollimatorGrid.json"
+box_file = resorces_root + "examples/id31_draft/RadialCollimatorBox.json"
 
 # output files
 output_root = tmp_path
@@ -67,7 +67,7 @@ chunksize = 100
 grid_wallthickness = .3
 
 # wallthickness of outer box wall in mm
-box_wallthickness = 1
+box_wallthickness = .7
 
 ########## helper functions and classes ######
 
