@@ -328,9 +328,9 @@ doc.recompute()
 # ~ blade_fusion3.Shapes = blade_fusion2
 # ~ doc.recompute()
 
-print(
-    f"re fusion done (Took {time() - start_fusion} s // {(time() - start_fusion)/3600} h)"
-)
+# ~ print(
+    # ~ f"re fusion done (Took {time() - start_fusion} s // {(time() - start_fusion)/3600} h)"
+# ~ )
 
 box = doc.addObject("Part::Thickness", "OuterBox")
 box.Faces = (clip_box.obj, ["Face4", "Face6"])
