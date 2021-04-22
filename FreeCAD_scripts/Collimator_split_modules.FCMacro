@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+#
+#
+# Copyright (c) 2020 Linus Pithan linus.pithan@esrf.fr
+# Distributed under the GNU LGPLv3. See LICENSE for more info.
+
+# general python imports
+from time import asctime, time
+import os
+from pathlib import Path
+
+# FreeCAD specific imports
+from FreeCAD import Vector
+import Part
+import Draft
+import ImportGui
+import Mesh
+
+# FreeCAD global setup
+#doc = App.activeDocument()
+
+# collimator path
+collimator_path = "/home/linus/Downloads/collimator_freecadcollimator.FCStd"
+
+# temporal storage for intermediate files
+tmp_path = str(Path.home()) + "/collimator_tmp/collimator_freecad"
+
+# output files
+output_root = tmp_path
+
+# export final 
+final_file_prefix  = output_root + "collimator_module_" #.FCStd, .stl , .step
+
+if not os.path.exists(tmp_path):
+    os.makedirs(tmp_path)
+
+#module bondaries in x direction
+ymin = -50
+zmin = -50
+ymax = 350
+zmax = 350
+module_bondaries = [50,150,350,550,750]   # 5 values in x direction ... 4 modules...
+
+#open collimator
+doc = FreeCAD.open(collimator_path)
+#collimator = [o for o in doc.Objects if "Collimator" in o.Name][0]
+collimator = doc.Collimator
+
+#add box
+box = App.ActiveDocument.addObject("Part::Box","Box")
+box.Label = "Cube"
+box.Placement=App.Placement(App.Vector(0,ymin,zmin), App.Rotation(App.Vector(0,0,1),0), App.Vector(0,0,0))
+box.Height = f'{zmax-zmin} mm'
+box.Width = f'{ymax-ymin} mm'
+doc.recompute()
+
+common=doc.addObject("Part::MultiCommon","Collimator_Module")
+common.Shapes = [box,collimator]
+
+print("start loop")
+mods= len(module_bondaries)-1
+for i in range(mods):
+    print(f"++++++++++ Module {i} ++++++++")
+    xmin = module_bondaries[i]
+    xmax = module_bondaries[i+1]
+    common.Label = f"Collimator_Module_{i}"
+    box.Placement=App.Placement(App.Vector(xmin,ymin,zmin), App.Rotation(App.Vector(0,0,1),0), App.Vector(0,0,0))
+    box.Length = f'{xmax-xmin} mm'
+    doc.recompute()
+    
+    print(f"saving... Module {i}")
+    # export and save
+    Mesh.export([common], final_file_prefix+str(i)+".stl")
+    ImportGui.export([common], final_file_prefix+str(i)+".step")
+    doc.saveAs(final_file_prefix+str(i)+".FCStd")
+    
+print("done")
