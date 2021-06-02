@@ -20,16 +20,16 @@ import Mesh
 #doc = App.activeDocument()
 
 # collimator path
-collimator_path = "/home/linus/Downloads/collimator_freecadcollimator.FCStd"
+collimator_path = "/home/esrf/pithan/collimator_tmp/300um/collimator_freecadcollimator.FCStd"
 
 # temporal storage for intermediate files
-tmp_path = str(Path.home()) + "/collimator_tmp/collimator_freecad"
+tmp_path = str(Path.home()) + "/collimator_tmp/300um"
 
 # output files
 output_root = tmp_path
 
 # export final 
-final_file_prefix  = output_root + "collimator_module_" #.FCStd, .stl , .step
+final_file_prefix  = output_root + "collimator_300um_start_at_30_module_" #.FCStd, .stl , .step
 
 if not os.path.exists(tmp_path):
     os.makedirs(tmp_path)
@@ -39,7 +39,7 @@ ymin = -50
 zmin = -50
 ymax = 350
 zmax = 350
-module_bondaries = [50,150,350,550,750]   # 5 values in x direction ... 4 modules...
+module_bondaries = [30,150,350,550,750]   # 5 values in x direction ... 4 modules...
 
 #open collimator
 doc = FreeCAD.open(collimator_path)

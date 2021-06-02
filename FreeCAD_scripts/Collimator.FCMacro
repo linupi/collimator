@@ -67,7 +67,7 @@ chunksize = 100
 grid_wallthickness = .3
 
 # wallthickness of outer box wall in mm
-box_wallthickness = 1
+box_wallthickness = 1.0
 
 ########## helper functions and classes ######
 

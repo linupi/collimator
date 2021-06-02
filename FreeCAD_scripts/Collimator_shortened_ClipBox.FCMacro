@@ -61,10 +61,10 @@ final_freecad_file = output_root + "collimator.FCStd"
 # to reduce occupied ram resouces the 3d model will be created in two steps
 # first generating chunks consisting of n (`chunksize`) blades which will be
 # fused together afterwards
-chunksize = 100
+chunksize = 110
 
 # wallthickness of inner grid structure in mm
-grid_wallthickness = .3
+grid_wallthickness = .5
 
 # wallthickness of outer box wall in mm
 box_wallthickness = 1
