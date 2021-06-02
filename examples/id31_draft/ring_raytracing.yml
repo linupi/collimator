@@ -35,8 +35,8 @@ camera:
   
 # input file 
 #input_file: examples/id31_draft/RadialCollimator.inc       #.inc file (converted from stl)
-input_file: examples/id31_draft/misc/module_stacks/0_300-1_500-2_500-3_500/full_stack_3_5_5_5.inc
+input_file: examples/id31_draft/misc/module_stacks/0_300-1_300-2_500-3_500/full_stack_3_3_5_5.inc
 
 # output path
 #output_dir: examples/id31_draft/raytracing_output
-output_dir: examples/id31_draft/raytracing_output_3_5_5_5
+output_dir: examples/id31_draft/raytracing_output_3_3_5_5
